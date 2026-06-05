@@ -1,0 +1,116 @@
+[
+  {
+    "ticket_id": "T-101",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/john.smith",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T09:12:11Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "ListBuckets",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.12",
+    "source": "AWS_CloudTrail",
+    "region": "us-east-1",
+    "service_log": "User arn:aws:iam::123456789012:user/john.smith performed ListBuckets action on S3. Standard read operation logged.",
+    "classification_context": "Cloud Infrastructure"
+  },
+  {
+    "ticket_id": "T-102",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/dev.ops",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T11:34:22Z",
+    "eventSource": "rds.amazonaws.com",
+    "eventName": "ModifyDBInstance",
+    "awsRegion": "us-west-2",
+    "sourceIPAddress": "203.0.113.45",
+    "source": "AWS_CloudTrail",
+    "region": "us-west-2",
+    "service_log": "Urgent migration issue. Temporary master AWS access key used: AKIAIOSFODNN7EXAMPLE. Developer rotated credentials after resolving database timeout on RDS instance.",
+    "classification_context": "Cloud Infrastructure"
+  },
+  {
+    "ticket_id": "T-103",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/billing.agent",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T13:45:09Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetObject",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.78",
+    "source": "AWS_CloudTrail",
+    "region": "us-east-1",
+    "service_log": "Customer John Doe (SSN: 000-12-3456, Email: john.doe@gmail.com) disputed a billing charge of $450. Case opened in Salesforce CRM.",
+    "classification_context": "Billing Finance"
+  },
+  {
+    "ticket_id": "T-104",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "AssumedRole",
+      "principalId": "AROACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:sts::123456789012:assumed-role/LambdaExecutionRole/cleanup-job",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T14:00:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "DeleteObject",
+    "awsRegion": "eu-west-1",
+    "sourceIPAddress": "aws.internal",
+    "source": "AWS_CloudTrail",
+    "region": "eu-west-1",
+    "service_log": "Automated Lambda function executed scheduled S3 bucket cleanup. 142 expired temp files removed. No user data affected.",
+    "classification_context": "Cloud Operations"
+  },
+  {
+    "ticket_id": "T-105",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/contractor.ext",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T15:22:37Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetObject",
+    "awsRegion": "us-east-2",
+    "sourceIPAddress": "198.51.100.22",
+    "source": "AWS_CloudTrail",
+    "region": "us-east-2",
+    "service_log": "Healthcare record accessed: Patient ID 78432, DOB 04/12/1985, Diagnosis Code ICD-10 E11.9 (Type 2 Diabetes). Accessed by external contractor account.",
+    "classification_context": "Healthcare Compliance"
+  },
+  {
+    "ticket_id": "T-106",
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDACKCEVSQ6C2EXAMPLE",
+      "arn": "arn:aws:iam::123456789012:user/admin.user",
+      "accountId": "123456789012"
+    },
+    "eventTime": "2024-03-15T16:10:55Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "PutRolePolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.91",
+    "source": "AWS_CloudTrail",
+    "region": "us-east-1",
+    "service_log": "IAM role policy updated for service account svc-data-pipeline. Added S3 full access permissions by admin user. Change ticket not found.",
+    "classification_context": "IAM Security"
+  }
+]

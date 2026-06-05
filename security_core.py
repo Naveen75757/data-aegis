@@ -1,0 +1,83 @@
+import json
+import os
+from groq import Groq
+
+# Initialize the Groq client
+# Automatically picks up your GROQ_API_KEY environment variable
+client = Groq()
+
+# Defined outside the function so it's not recreated on every call
+system_prompt = """
+You are an enterprise AI Data Security classification engine, similar to Cyera's AI Guardian platform.
+
+Analyze the following AWS CloudTrail log entry and identify if it contains any of these sensitive data classes:
+- Credentials (AWS keys, passwords, tokens, secrets)
+- PII (names, SSNs, emails, phone numbers, dates of birth)
+- Healthcare (patient IDs, diagnosis codes, medical records - HIPAA relevant)
+- Financial (credit cards, bank accounts, transaction amounts tied to individuals)
+- IAM Violation (unauthorized permission changes, missing change tickets, privilege escalation)
+
+Return ONLY a valid JSON object with exactly these keys:
+{
+  "contains_sensitive_data": true or false,
+  "data_class": "None" or "Credentials" or "PII" or "Healthcare" or "Financial" or "IAM_Violation",
+  "risk_score": a number from 0 to 10,
+  "risk_reasoning": "one sentence explaining why this is risky or safe",
+  "remediation_action": "None" or "Mask_Credentials" or "Mask_PII" or "Mask_Healthcare" or "Flag_IAM"
+}
+
+Return nothing else. No explanation. No markdown. Just the JSON object.
+"""
+
+def classify_log_entry(raw_log_text):
+    """
+    Data-Aegis Classification Engine.
+    
+    Mimics Cyera's AI-native data classification approach —
+    instead of dumb regex, we use an LLM to READ context and 
+    identify hidden sensitive data classes in unstructured text.
+    
+    Returns structured risk metadata for every log entry.
+    """
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Classify this log entry:\n\n{raw_log_text}"}
+            ],
+            temperature=0,
+            max_tokens=256
+        )
+        
+        response_text = response.choices[0].message.content.strip()
+        
+        # Remove markdown code blocks if model adds them
+        if response_text.startswith("```"):
+            response_text = response_text.split("```")[1]
+            if response_text.startswith("json"):
+                response_text = response_text[4:]
+        
+        return json.loads(response_text.strip())
+    
+    except json.JSONDecodeError:
+        # LLM returned malformed JSON — fail safe, flag for review
+        print("  ⚠️  Classification parse error — defaulting to safe mode")
+        return {
+            "contains_sensitive_data": True,
+            "data_class": "Unknown",
+            "risk_score": 5,
+            "risk_reasoning": "Classification failed — flagged for manual review",
+            "remediation_action": "Flag_For_Review"
+        }
+    
+    except Exception as e:
+        # API unavailable or any other error — always fail safe
+        print(f"  ⚠️  API error: {str(e)} — record flagged for manual review")
+        return {
+            "contains_sensitive_data": True,
+            "data_class": "Unknown",
+            "risk_score": 5,
+            "risk_reasoning": "API unavailable — flagged for manual review",
+            "remediation_action": "Flag_For_Review"
+        }
