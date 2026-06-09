@@ -1,0 +1,97 @@
+{
+  "session_timestamp": "2026-06-09 15:20:31",
+  "total_incidents": 5,
+  "agent_memory_summary": {
+    "regions_flagged": [
+      "us-east-1",
+      "us-west-2",
+      "us-east-2"
+    ],
+    "repeat_threat_regions": [
+      "us-east-1"
+    ],
+    "total_records_scanned": 9
+  },
+  "incidents": [
+    {
+      "incident_id": "INC-44995",
+      "timestamp": "2026-06-09 15:20:22",
+      "severity": "CRITICAL",
+      "source_record": "T-103",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-1",
+      "data_class": "PII",
+      "risk_score": 8,
+      "description": "The log entry contains personally identifiable information, including a social security number and email address, which poses a significant risk of identity theft.",
+      "remediation_applied": "Mask_PII",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": false
+    },
+    {
+      "incident_id": "INC-21800",
+      "timestamp": "2026-06-09 15:20:23",
+      "severity": "CRITICAL",
+      "source_record": "T-102",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-west-2",
+      "data_class": "Credentials",
+      "risk_score": 8,
+      "description": "The log entry contains a temporary master AWS access key, which poses a significant security risk if exposed to unauthorized parties",
+      "remediation_applied": "Mask_Credentials",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": false
+    },
+    {
+      "incident_id": "INC-72081",
+      "timestamp": "2026-06-09 15:20:26",
+      "severity": "CRITICAL",
+      "source_record": "T-103",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-1",
+      "data_class": "PII",
+      "risk_score": 8,
+      "description": "The log entry contains a social security number and email address, which are sensitive personally identifiable information",
+      "remediation_applied": "Mask_PII",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": false
+    },
+    {
+      "incident_id": "INC-21533",
+      "timestamp": "2026-06-09 15:20:30",
+      "severity": "CRITICAL",
+      "source_record": "T-105",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-2",
+      "data_class": "Healthcare",
+      "risk_score": 9,
+      "description": "This log entry contains protected health information, including patient ID, date of birth, and diagnosis code, which is highly sensitive and regulated by HIPAA.",
+      "remediation_applied": "Mask_Healthcare",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": true
+    },
+    {
+      "incident_id": "INC-18382",
+      "timestamp": "2026-06-09 15:20:31",
+      "severity": "CRITICAL",
+      "source_record": "T-103",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-1",
+      "data_class": "PII",
+      "risk_score": 10,
+      "description": "The log entry contains personally identifiable information, including a social security number and email address, which poses a significant risk of identity theft.",
+      "remediation_applied": "Mask_PII",
+      "memory_escalated": true,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": true
+    }
+  ]
+}
