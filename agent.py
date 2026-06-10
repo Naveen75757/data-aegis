@@ -252,7 +252,12 @@ def run_agent(database_rows, cycles=3):
 
 
 if __name__ == "__main__":
-    with open("mock_db.json", "r") as f:
-        database_rows = json.load(f)
-
+    from data_generator import generate_live_stream
+    
+    print("🌐 Data-Aegis Live Stream Mode — Synthetic data generator active")
+    print("   Generating fresh enterprise log records for each cycle...\n")
+    
+    # Generate fresh records for initial batch
+    database_rows = generate_live_stream(10)
+    
     run_agent(database_rows, cycles=3)

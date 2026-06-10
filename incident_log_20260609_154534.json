@@ -1,0 +1,47 @@
+{
+  "session_timestamp": "2026-06-09 15:45:34",
+  "total_incidents": 2,
+  "agent_memory_summary": {
+    "regions_flagged": [
+      "us-east-2"
+    ],
+    "repeat_threat_regions": [
+      "us-east-2"
+    ],
+    "total_records_scanned": 9
+  },
+  "incidents": [
+    {
+      "incident_id": "INC-76187",
+      "timestamp": "2026-06-09 15:45:25",
+      "severity": "CRITICAL",
+      "source_record": "T-4817",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-2",
+      "data_class": "Healthcare",
+      "risk_score": 9,
+      "description": "This log entry contains protected health information, including patient ID, date of birth, and diagnosis code, which is highly sensitive and regulated by HIPAA.",
+      "remediation_applied": "Mask_Healthcare",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": true
+    },
+    {
+      "incident_id": "INC-67826",
+      "timestamp": "2026-06-09 15:45:34",
+      "severity": "CRITICAL",
+      "source_record": "T-3618",
+      "source_system": "AWS_CloudTrail",
+      "region": "us-east-2",
+      "data_class": "Healthcare",
+      "risk_score": 9,
+      "description": "This log entry contains protected health information, including patient ID, date of birth, and diagnosis code, which is highly sensitive and regulated by HIPAA.",
+      "remediation_applied": "Mask_Healthcare",
+      "memory_escalated": false,
+      "status": "AUTO_REMEDIATED",
+      "assigned_to": "SOC_AGENT_01",
+      "escalate_to_human": true
+    }
+  ]
+}
