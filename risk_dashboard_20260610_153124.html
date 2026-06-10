@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data-Aegis Risk Intelligence Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 2rem; }
+        .header { border-bottom: 1px solid #2d2d3a; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+        .header h1 { font-size: 1.8rem; color: #ffffff; font-weight: 600; }
+        .header h1 span { color: #4a9eff; }
+        .header p { color: #888; margin-top: 0.5rem; font-size: 0.9rem; }
+        .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: #1a1d2e; border: 1px solid #2d2d3a; border-radius: 8px; padding: 1.25rem; }
+        .metric-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+        .metric-card .value { font-size: 2rem; font-weight: 700; margin-top: 0.5rem; }
+        .metric-card .value.red { color: #e74c3c; }
+        .metric-card .value.green { color: #2ecc71; }
+        .metric-card .value.blue { color: #4a9eff; }
+        .metric-card .value.orange { color: #e67e22; }
+        .section { background: #1a1d2e; border: 1px solid #2d2d3a; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .section h2 { font-size: 1rem; color: #ffffff; font-weight: 600; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.75rem; color: #888; text-transform: uppercase; padding: 0.5rem; border-bottom: 1px solid #2d2d3a; }
+        td { padding: 0.75rem 0.5rem; border-bottom: 1px solid #1e2030; font-size: 0.875rem; }
+        tr:last-child td { border-bottom: none; }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: white; }
+        .bar-container { background: #2d2d3a; border-radius: 4px; height: 8px; width: 200px; }
+        .bar { height: 8px; border-radius: 4px; }
+        .repeat-flag { color: #e67e22; font-size: 0.75rem; font-weight: 600; }
+        code { background: #2d2d3a; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.8rem; color: #4a9eff; }
+        .footer { text-align: center; color: #444; font-size: 0.8rem; margin-top: 2rem; }
+        .status-bar { background: #1a1d2e; border: 1px solid #2ecc71; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; }
+        .status-dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; }
+        .status-text { color: #2ecc71; font-size: 0.875rem; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Data-<span>Aegis</span> Risk Intelligence Dashboard</h1>
+        <p>AI Security Posture Management — Session Report | June 10, 2026 15:31:24</p>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <div class="status-text">Agent session complete — Audit trail persisted — Safe payload delivered to downstream AI</div>
+    </div>
+
+    <div class="metrics">
+        <div class="metric-card">
+            <div class="label">Total Scanned</div>
+            <div class="value blue">9</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Incidents Generated</div>
+            <div class="value red">4</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Human Escalations</div>
+            <div class="value orange">2</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Auto Remediated</div>
+            <div class="value green">2</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Threat Breakdown by Data Class</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data Class</th>
+                    <th>Count</th>
+                    <th>Distribution</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td><span class="badge" style="background:#e74c3c">PII</span></td>
+            <td>2</td>
+            <td>
+                <div class="bar-container">
+                    <div class="bar" style="width:50%; background:#e74c3c"></div>
+                </div>
+            </td>
+            <td>50%</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#e67e22">Credentials</span></td>
+            <td>1</td>
+            <td>
+                <div class="bar-container">
+                    <div class="bar" style="width:25%; background:#e67e22"></div>
+                </div>
+            </td>
+            <td>25%</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#9b59b6">Healthcare</span></td>
+            <td>1</td>
+            <td>
+                <div class="bar-container">
+                    <div class="bar" style="width:25%; background:#9b59b6"></div>
+                </div>
+            </td>
+            <td>25%</td>
+        </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Risk by AWS Region</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Region</th>
+                    <th>Incidents</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td>us-east-1 <span class="repeat-flag">⚠️ REPEAT</span></td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>us-west-2</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>us-east-2</td>
+            <td>1</td>
+        </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Open Incidents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Incident ID</th>
+                    <th>Severity</th>
+                    <th>Data Class</th>
+                    <th>Region</th>
+                    <th>Risk Score</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td><code>INC-44995</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>PII</td>
+            <td>us-east-1</td>
+            <td>8/10</td>
+            <td>✅ Auto-remediated</td>
+        </tr>
+        <tr>
+            <td><code>INC-21800</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>Credentials</td>
+            <td>us-west-2</td>
+            <td>8/10</td>
+            <td>✅ Auto-remediated</td>
+        </tr>
+        <tr>
+            <td><code>INC-21533</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>Healthcare</td>
+            <td>us-east-2</td>
+            <td>9/10</td>
+            <td>👤 Human Review</td>
+        </tr>
+        <tr>
+            <td><code>INC-18382</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>PII</td>
+            <td>us-east-1</td>
+            <td>10/10 🧠</td>
+            <td>👤 Human Review</td>
+        </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>Data-Aegis AI-SPM Gateway — Powered by LLaMA 3.3 70B — github.com/Naveen75757/data-aegis</p>
+    </div>
+</body>
+</html>

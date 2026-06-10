@@ -225,6 +225,15 @@ def run_agent(database_rows, cycles=3):
     # Persist audit log
     log_file = persist_incident_log(all_incidents)
 
+# Generate risk dashboard
+    from report_generator import save_report
+    dashboard_file = save_report(all_incidents, {
+        "total_records_scanned": len(agent_memory["seen_records"]),
+        "regions_flagged": list(agent_memory["region_threat_count"].keys()),
+        "repeat_threat_regions": agent_memory["repeated_threats"]
+    })
+    print(f"  📊 Risk Dashboard:         {dashboard_file}")
+
     # Final report
     print("\n\n" + "=" * 60)
     print("  AGENT SESSION COMPLETE — FINAL REPORT")
