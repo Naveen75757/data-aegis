@@ -29,6 +29,66 @@ Return ONLY a valid JSON object with exactly these keys:
 Return nothing else. No explanation. No markdown. Just the JSON object.
 """
 
+# ============================================================
+# MITRE ATT&CK MAPPING
+# Maps Data-Aegis threat classifications to real MITRE ATT&CK
+# techniques — the universal framework used by SOC teams
+# worldwide to classify and communicate security threats.
+# ============================================================
+
+MITRE_MAPPING = {
+    "Credentials": {
+        "technique_id": "T1552",
+        "technique_name": "Unsecured Credentials",
+        "tactic": "Credential Access",
+        "description": "Adversaries search for unsecured credentials in logs, config files, and data stores",
+        "url": "https://attack.mitre.org/techniques/T1552/"
+    },
+    "PII": {
+        "technique_id": "T1005",
+        "technique_name": "Data from Local System",
+        "tactic": "Collection",
+        "description": "Adversaries collect sensitive personal data from enterprise systems and databases",
+        "url": "https://attack.mitre.org/techniques/T1005/"
+    },
+    "Healthcare": {
+        "technique_id": "T1530",
+        "technique_name": "Data from Cloud Storage",
+        "tactic": "Collection",
+        "description": "Adversaries access protected health information stored in cloud storage objects",
+        "url": "https://attack.mitre.org/techniques/T1530/"
+    },
+    "Financial": {
+        "technique_id": "T1213",
+        "technique_name": "Data from Information Repositories",
+        "tactic": "Collection",
+        "description": "Adversaries collect financial records from enterprise information repositories",
+        "url": "https://attack.mitre.org/techniques/T1213/"
+    },
+    "IAM_Violation": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tactic": "Privilege Escalation",
+        "description": "Adversaries obtain and abuse credentials of existing accounts to gain elevated permissions",
+        "url": "https://attack.mitre.org/techniques/T1078/"
+    },
+    "Unknown": {
+        "technique_id": "T1unknown",
+        "technique_name": "Undetermined Technique",
+        "tactic": "Unknown",
+        "description": "Classification failed — manual investigation required",
+        "url": "https://attack.mitre.org/techniques/"
+    }
+}
+
+
+def get_mitre_mapping(data_class):
+    """
+    Returns MITRE ATT&CK technique for a given data class.
+    Defaults to Unknown if data class not in mapping.
+    """
+    return MITRE_MAPPING.get(data_class, MITRE_MAPPING["Unknown"])
+
 def classify_log_entry(raw_log_text):
     """
     Data-Aegis Classification Engine.

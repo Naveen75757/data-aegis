@@ -86,13 +86,18 @@ def confidence_threshold_decision(risk_score):
     else:
         return "CRITICAL_ESCALATE"
 
-
 def generate_incident_ticket(row, security_meta, escalated=False):
     """
     Generates structured incident ticket.
     Persisted to audit log for compliance and forensics.
+    Includes MITRE ATT&CK mapping for every detected threat.
     """
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Get MITRE ATT&CK mapping for this threat
+    from security_core import get_mitre_mapping
+    mitre = get_mitre_mapping(security_meta["data_class"])
+    
     return {
         "incident_id": f"INC-{random.randint(10000, 99999)}",
         "timestamp": timestamp,
@@ -104,12 +109,15 @@ def generate_incident_ticket(row, security_meta, escalated=False):
         "risk_score": security_meta["risk_score"],
         "description": security_meta["risk_reasoning"],
         "remediation_applied": security_meta["remediation_action"],
+        "mitre_technique_id": mitre["technique_id"],
+        "mitre_technique_name": mitre["technique_name"],
+        "mitre_tactic": mitre["tactic"],
+        "mitre_url": mitre["url"],
         "memory_escalated": escalated,
         "status": "AUTO_REMEDIATED",
         "assigned_to": "SOC_AGENT_01",
         "escalate_to_human": security_meta["risk_score"] >= 9
     }
-
 
 def persist_incident_log(incidents):
     """
@@ -200,6 +208,7 @@ def run_agent(database_rows, cycles=3):
                 all_incidents.append(ticket)
                 print(f"  🚨 Risk Score: {security_meta['risk_score']}/10 | AUTO_REMEDIATED | Class: {security_meta['data_class']}")
                 print(f"  🎫 Incident: {ticket['incident_id']} | Severity: {ticket['severity']}")
+                print(f"  🎯 MITRE: {ticket['mitre_technique_id']} — {ticket['mitre_technique_name']} [{ticket['mitre_tactic']}]")
 
             elif decision == "CRITICAL_ESCALATE":
                 sanitized = apply_dynamic_masking(log_content, security_meta["data_class"])
@@ -207,6 +216,7 @@ def run_agent(database_rows, cycles=3):
                 all_incidents.append(ticket)
                 print(f"  🔴 Risk Score: {security_meta['risk_score']}/10 | CRITICAL | Class: {security_meta['data_class']}")
                 print(f"  🎫 Incident: {ticket['incident_id']} | Severity: {ticket['severity']}")
+                print(f"  🎯 MITRE: {ticket['mitre_technique_id']} — {ticket['mitre_technique_name']} [{ticket['mitre_tactic']}]")
                 print(f"  👤 HUMAN ESCALATION REQUIRED — Assigned to: {ticket['assigned_to']}")
 
             update_agent_memory(row, security_meta)

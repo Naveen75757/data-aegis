@@ -80,11 +80,14 @@ def generate_html_report(incidents, agent_memory_summary):
         severity_color = "#e74c3c" if inc["severity"] == "CRITICAL" else "#e67e22"
         escalation = "👤 Human Review" if inc["escalate_to_human"] else "✅ Auto-remediated"
         memory_flag = " 🧠" if inc.get("memory_escalated") else ""
+        mitre_id = inc.get('mitre_technique_id', 'N/A')
+        mitre_name = inc.get('mitre_technique_name', 'N/A')
         incident_rows += f"""
         <tr>
             <td><code>{inc['incident_id']}</code></td>
             <td><span class="badge" style="background:{severity_color}">{inc['severity']}</span></td>
             <td>{inc['data_class']}</td>
+            <td><code style="color:#4a9eff">{mitre_id}</code> {mitre_name}</td>
             <td>{inc['region']}</td>
             <td>{inc['risk_score']}/10{memory_flag}</td>
             <td>{escalation}</td>
@@ -199,6 +202,7 @@ def generate_html_report(incidents, agent_memory_summary):
                     <th>Incident ID</th>
                     <th>Severity</th>
                     <th>Data Class</th>
+                    <th>MITRE Technique</th>
                     <th>Region</th>
                     <th>Risk Score</th>
                     <th>Status</th>
