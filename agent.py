@@ -4,6 +4,7 @@ import random
 from datetime import datetime
 from security_core import classify_log_entry
 from app import apply_dynamic_masking
+from anomaly_detector import run_anomaly_detection
 
 # ============================================================
 # DATA-AEGIS AUTONOMOUS SECURITY AGENT v2
@@ -139,6 +140,12 @@ def persist_incident_log(incidents):
         "incidents": incidents
     }
 
+    # Generate SIEM alerts for each incident
+    from security_core import format_siem_alert
+    siem_alerts = [format_siem_alert(inc) for inc in incidents]
+    
+    audit_log["siem_alerts"] = siem_alerts
+
     with open(filename, "w") as f:
         json.dump(audit_log, f, indent=2)
 
@@ -181,6 +188,14 @@ def run_agent(database_rows, cycles=3):
                 print(f"  ✅ Risk Score: {security_meta['risk_score']}/10 | LOG_ONLY | {security_meta['risk_reasoning']}")
                 update_agent_memory(row, security_meta)
                 continue
+
+
+# Layer 2 — Behavioral anomaly detection
+            anomalies = run_anomaly_detection(row)
+            for anomaly in anomalies:
+                print(f"  🔍 ANOMALY: {anomaly['anomaly_type']} | Risk: {anomaly['risk_score']}/10")
+                print(f"     {anomaly['description']}")
+                print(f"     MITRE: {anomaly['mitre_technique_id']} — {anomaly['mitre_technique_name']} [{anomaly['mitre_tactic']}]")
 
             # Check agent memory for escalation
             adjusted_score, memory_escalated = get_escalation_level(

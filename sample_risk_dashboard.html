@@ -39,7 +39,7 @@
 <body>
     <div class="header">
         <h1>Data-<span>Aegis</span> Risk Intelligence Dashboard</h1>
-        <p>AI Security Posture Management — Session Report | June 10, 2026 15:48:38</p>
+        <p>AI Security Posture Management — Session Report | June 11, 2026 19:27:25</p>
     </div>
 
     <div class="status-bar">
@@ -50,19 +50,19 @@
     <div class="metrics">
         <div class="metric-card">
             <div class="label">Total Scanned</div>
-            <div class="value blue">9</div>
+            <div class="value blue">12</div>
         </div>
         <div class="metric-card">
             <div class="label">Incidents Generated</div>
-            <div class="value red">4</div>
+            <div class="value red">6</div>
         </div>
         <div class="metric-card">
             <div class="label">Human Escalations</div>
-            <div class="value orange">2</div>
+            <div class="value orange">6</div>
         </div>
         <div class="metric-card">
             <div class="label">Auto Remediated</div>
-            <div class="value green">2</div>
+            <div class="value green">0</div>
         </div>
     </div>
 
@@ -80,34 +80,34 @@
             <tbody>
                 
         <tr>
-            <td><span class="badge" style="background:#e74c3c">PII</span></td>
-            <td>2</td>
+            <td><span class="badge" style="background:#e67e22">Credentials</span></td>
+            <td>1</td>
             <td>
                 <div class="bar-container">
-                    <div class="bar" style="width:50%; background:#e74c3c"></div>
+                    <div class="bar" style="width:17%; background:#e67e22"></div>
                 </div>
             </td>
-            <td>50%</td>
+            <td>17%</td>
         </tr>
         <tr>
             <td><span class="badge" style="background:#9b59b6">Healthcare</span></td>
-            <td>1</td>
+            <td>4</td>
             <td>
                 <div class="bar-container">
-                    <div class="bar" style="width:25%; background:#9b59b6"></div>
+                    <div class="bar" style="width:67%; background:#9b59b6"></div>
                 </div>
             </td>
-            <td>25%</td>
+            <td>67%</td>
         </tr>
         <tr>
-            <td><span class="badge" style="background:#3498db">IAM_Violation</span></td>
+            <td><span class="badge" style="background:#e74c3c">PII</span></td>
             <td>1</td>
             <td>
                 <div class="bar-container">
-                    <div class="bar" style="width:25%; background:#3498db"></div>
+                    <div class="bar" style="width:17%; background:#e74c3c"></div>
                 </div>
             </td>
-            <td>25%</td>
+            <td>17%</td>
         </tr>
             </tbody>
         </table>
@@ -125,12 +125,12 @@
             <tbody>
                 
         <tr>
-            <td>ap-southeast-1 <span class="repeat-flag">⚠️ REPEAT</span></td>
-            <td>2</td>
+            <td>us-east-1 <span class="repeat-flag">⚠️ REPEAT</span></td>
+            <td>3</td>
         </tr>
         <tr>
-            <td>us-east-1</td>
-            <td>1</td>
+            <td>eu-west-1 <span class="repeat-flag">⚠️ REPEAT</span></td>
+            <td>2</td>
         </tr>
         <tr>
             <td>us-east-2</td>
@@ -148,6 +148,7 @@
                     <th>Incident ID</th>
                     <th>Severity</th>
                     <th>Data Class</th>
+                    <th>MITRE Technique</th>
                     <th>Region</th>
                     <th>Risk Score</th>
                     <th>Status</th>
@@ -156,36 +157,58 @@
             <tbody>
                 
         <tr>
-            <td><code>INC-32738</code></td>
+            <td><code>INC-26657</code></td>
             <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
-            <td>PII</td>
+            <td>Credentials</td>
+            <td><code style="color:#4a9eff">T1552</code> Unsecured Credentials</td>
+            <td>us-east-2</td>
+            <td>9/10</td>
+            <td>👤 Human Review</td>
+        </tr>
+        <tr>
+            <td><code>INC-79001</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>Healthcare</td>
+            <td><code style="color:#4a9eff">T1530</code> Data from Cloud Storage</td>
             <td>us-east-1</td>
             <td>9/10</td>
             <td>👤 Human Review</td>
         </tr>
         <tr>
-            <td><code>INC-93230</code></td>
+            <td><code>INC-12667</code></td>
             <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
             <td>Healthcare</td>
-            <td>ap-southeast-1</td>
+            <td><code style="color:#4a9eff">T1530</code> Data from Cloud Storage</td>
+            <td>eu-west-1</td>
             <td>9/10</td>
             <td>👤 Human Review</td>
         </tr>
         <tr>
-            <td><code>INC-61617</code></td>
+            <td><code>INC-56242</code></td>
             <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
             <td>PII</td>
-            <td>us-east-2</td>
-            <td>8/10</td>
-            <td>✅ Auto-remediated</td>
+            <td><code style="color:#4a9eff">T1005</code> Data from Local System</td>
+            <td>us-east-1</td>
+            <td>9/10</td>
+            <td>👤 Human Review</td>
         </tr>
         <tr>
-            <td><code>INC-29788</code></td>
+            <td><code>INC-97997</code></td>
             <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
-            <td>IAM_Violation</td>
-            <td>ap-southeast-1</td>
-            <td>8/10</td>
-            <td>✅ Auto-remediated</td>
+            <td>Healthcare</td>
+            <td><code style="color:#4a9eff">T1530</code> Data from Cloud Storage</td>
+            <td>eu-west-1</td>
+            <td>9/10</td>
+            <td>👤 Human Review</td>
+        </tr>
+        <tr>
+            <td><code>INC-31876</code></td>
+            <td><span class="badge" style="background:#e74c3c">CRITICAL</span></td>
+            <td>Healthcare</td>
+            <td><code style="color:#4a9eff">T1530</code> Data from Cloud Storage</td>
+            <td>us-east-1</td>
+            <td>10/10 🧠</td>
+            <td>👤 Human Review</td>
         </tr>
             </tbody>
         </table>

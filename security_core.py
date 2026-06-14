@@ -89,6 +89,33 @@ def get_mitre_mapping(data_class):
     """
     return MITRE_MAPPING.get(data_class, MITRE_MAPPING["Unknown"])
 
+def format_siem_alert(incident):
+    """
+    Formats a Data-Aegis incident as a Splunk-style SIEM alert.
+    Shows how findings integrate into enterprise SIEM workflows.
+    Real SOC teams consume alerts in this format from Splunk,
+    Microsoft Sentinel, or Elastic SIEM.
+    """
+    mitre = get_mitre_mapping(incident.get("data_class", "Unknown"))
+    
+    return {
+        "alert_name": f"Data-Aegis: {incident.get('data_class')} Exposure Detected",
+        "index": "cloudtrail",
+        "sourcetype": "aws:cloudtrail",
+        "severity": incident.get("severity", "HIGH"),
+        "risk_score": incident.get("risk_score", 0),
+        "mitre_technique": mitre["technique_id"],
+        "mitre_tactic": mitre["tactic"],
+        "dest_region": incident.get("region"),
+        "source_record": incident.get("source_record"),
+        "data_class": incident.get("data_class"),
+        "remediation": incident.get("remediation_applied"),
+        "escalate": incident.get("escalate_to_human", False),
+        "playbook": f"playbooks/{incident.get('data_class', '').lower()}_exposure_response.md",
+        "timestamp": incident.get("timestamp"),
+        "assigned_to": incident.get("assigned_to", "SOC_AGENT_01")
+    }
+
 def classify_log_entry(raw_log_text):
     """
     Data-Aegis Classification Engine.
