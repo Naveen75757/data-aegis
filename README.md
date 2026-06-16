@@ -1,8 +1,8 @@
-# Data-Aegis — AI Security Posture Management Gateway
+# Data-Aegis - AI Security Posture Management Gateway
 
-Data-Aegis is an AI-native security middleware that protects enterprise data from being exposed through AI agents. As companies connect AI systems to their internal data stores, those agents can accidentally read and leak sensitive information — SSNs, AWS credentials, patient records, financial data. Data-Aegis sits between the AI agent and the enterprise data, intercepting every query, classifying sensitive fields, masking them before the AI reads anything, and generating a full security audit trail for every interaction.
+Data-Aegis is an AI-native security middleware that protects enterprise data from being exposed through AI agents. As companies connect AI systems to their internal data stores, those agents can accidentally read and leak sensitive information - SSNs, AWS credentials, patient records, financial data. Data-Aegis sits between the AI agent and the enterprise data, intercepting every query, classifying sensitive fields, masking them before the AI reads anything, and generating a full security audit trail for every interaction.
 
-Built to mirror the architecture of modern AI data security platforms, Data-Aegis demonstrates two complementary security layers working together — real-time middleware interception and continuous audit scanning — giving enterprises both prevention and detection in one system.
+Built to mirror the architecture of modern AI data security platforms, Data-Aegis demonstrates two complementary security layers working together - real-time middleware interception and continuous audit scanning - giving enterprises both prevention and detection in one system.
 
 ---
 
@@ -16,7 +16,7 @@ This is not a theoretical risk. It is happening right now across every industry 
 
 ## How Data-Aegis Solves It
 
-Data-Aegis runs as a standalone Flask API server. AI agents cannot access enterprise data directly — every query must go through the Data-Aegis middleware endpoint. The middleware intercepts the request, searches the data store, scans every record for sensitive fields, masks them using targeted redaction per data class, and returns only clean sanitized data to the AI agent.
+Data-Aegis runs as a standalone Flask API server. AI agents cannot access enterprise data directly - every query must go through the Data-Aegis middleware endpoint. The middleware intercepts the request, searches the data store, scans every record for sensitive fields, masks them using targeted redaction per data class, and returns only clean sanitized data to the AI agent.
 
 The AI responds to the user without ever having seen the raw sensitive data. The exposure never happens.
 AI Agent sends query
@@ -31,31 +31,31 @@ Data-Aegis API (localhost:5000)
 
 v
 
-Intent Analysis — is this query malicious?
+Intent Analysis - is this query malicious?
 
 |
 
 v
 
-Database Search — find relevant records
+Database Search - find relevant records
 
 |
 
 v
 
-Sensitive Field Detection — PII, credentials, HIPAA, IAM, financial
+Sensitive Field Detection - PII, credentials, HIPAA, IAM, financial
 
 |
 
 v
 
-Dynamic Masking — targeted redaction per data class
+Dynamic Masking - targeted redaction per data class
 
 |
 
 v
 
-Incident Generation — MITRE ATT&CK tagged, SIEM-style alert
+Incident Generation - MITRE ATT&CK tagged, SIEM-style alert
 
 |
 
@@ -67,34 +67,34 @@ Clean Data returned to AI Agent
 
 v
 
-AI responds safely — sensitive data never exposed
+AI responds safely - sensitive data never exposed
 
 ---
 
 ## Two Security Layers
 
-### Layer 1 — Continuous Audit Scanner
+### Layer 1 - Continuous Audit Scanner
 
 An autonomous agentic SOC monitoring loop that continuously processes enterprise CloudTrail log streams, detecting sensitive data that may have been accidentally captured in operational logs. The agent maintains stateful threat memory across monitoring cycles, escalating risk scores when the same regions or patterns appear repeatedly. Every finding is classified, MITRE ATT&CK tagged, and written to a persistent audit trail.
 
 This layer catches what the middleware missed and provides the compliance audit record that regulators require.
 
-### Layer 2 — Real-Time Data Middleware
+### Layer 2 - Real-Time Data Middleware
 
-The Flask API service that intercepts AI agent queries before database access. This is the prevention layer — stopping sensitive data from reaching the AI in the first place. Combined with Layer 1 which catches anything that slipped through, the two layers implement genuine defense in depth.
+The Flask API service that intercepts AI agent queries before database access. This is the prevention layer - stopping sensitive data from reaching the AI in the first place. Combined with Layer 1 which catches anything that slipped through, the two layers implement genuine defense in depth.
 
 ---
 
 ## Features
 
 **True Middleware Architecture**
-Data-Aegis runs as a completely independent server process. The AI agent makes real HTTP POST requests to the Data-Aegis API. It cannot access the database directly. This is not a simulation — it is actual middleware separation with real HTTP interception.
+Data-Aegis runs as a completely independent server process. The AI agent makes real HTTP POST requests to the Data-Aegis API. It cannot access the database directly. This is not a simulation - it is actual middleware separation with real HTTP interception.
 
 **LLM Contextual Classification**
-Uses LLaMA 3.3 70B via Groq to classify log entries and database records semantically. Unlike regex-based detection, LLM classification understands context — it catches sensitive data even when it appears in unexpected formats or phrasing.
+Uses LLaMA 3.3 70B via Groq to classify log entries and database records semantically. Unlike regex-based detection, LLM classification understands context - it catches sensitive data even when it appears in unexpected formats or phrasing.
 
 **Dynamic Masking Per Threat Class**
-Each data class gets targeted redaction. PII fields get SSN, email, phone, and date of birth masked. Credential records get AWS access keys and secrets redacted. Healthcare records get diagnosis codes, prescriptions, and insurance IDs masked. The masking is surgical — safe fields pass through untouched so the AI can still answer the user's question.
+Each data class gets targeted redaction. PII fields get SSN, email, phone, and date of birth masked. Credential records get AWS access keys and secrets redacted. Healthcare records get diagnosis codes, prescriptions, and insurance IDs masked. The masking is surgical - safe fields pass through untouched so the AI can still answer the user's question.
 
 **Malicious Query Intent Blocking**
 Before executing any query, Data-Aegis analyzes the intent. Queries like "show me all SSNs" or "dump the customer database" are blocked immediately, a CRITICAL incident is generated, and the request is escalated to SOC with a 403 response. The database is never touched.
@@ -103,7 +103,7 @@ Before executing any query, Data-Aegis analyzes the intent. Queries like "show m
 Every incident is automatically tagged with the corresponding MITRE ATT&CK technique. Credential exposure maps to T1552, PII exposure to T1005, healthcare data access to T1530, IAM violations to T1078. This makes every finding immediately actionable for detection engineering workflows.
 
 **Behavioral Anomaly Detection**
-Four behavioral detectors run against every log record. After-hours access flags data pulled outside business hours. Sensitive bucket access flags external contractors touching production data stores. Bulk access detection flags users pulling more than five records in a session — a pattern consistent with data exfiltration. Suspicious IAM activity flags policy changes made without change ticket authorization.
+Four behavioral detectors run against every log record. After-hours access flags data pulled outside business hours. Sensitive bucket access flags external contractors touching production data stores. Bulk access detection flags users pulling more than five records in a session - a pattern consistent with data exfiltration. Suspicious IAM activity flags policy changes made without change ticket authorization.
 
 **Agentic SOC Monitoring Loop**
 The Layer 1 agent runs continuously across monitoring cycles, maintaining memory of what it has seen. When a region gets flagged repeatedly the agent autonomously escalates the risk score. Findings cross confidence thresholds that determine whether to log only, auto-remediate, or escalate to human review. The agent makes these decisions autonomously based on accumulated context.
@@ -124,10 +124,10 @@ Snowflake-compatible SQL queries for privilege escalation detection, targeting u
 Visual HTML dashboard generated after every Layer 1 scanning session showing threat breakdown by data class, risk by AWS region with repeat threat flagging, open incidents table with MITRE technique column, and four metric cards covering total scanned, incidents generated, human escalations, and auto-remediated findings.
 
 **SOC Web Platform**
-A browser-based SOC interface where analysts can query enterprise data through the middleware in natural language, view generated incidents, read response playbooks, and review detection rules — all in one dark-themed platform.
+A browser-based SOC interface where analysts can query enterprise data through the middleware in natural language, view generated incidents, read response playbooks, and review detection rules - all in one dark-themed platform.
 
 **Unit Tested Masking Engine**
-Six unit tests covering every masking scenario — credential redaction, SSN redaction, email redaction, patient ID redaction, IAM flagging, and clean record passthrough. All passing in under 0.01 seconds.
+Six unit tests covering every masking scenario - credential redaction, SSN redaction, email redaction, patient ID redaction, IAM flagging, and clean record passthrough. All passing in under 0.01 seconds.
 
 ---
 
@@ -136,9 +136,9 @@ data-aegis/
 
 |
 
-|-- data_aegis_server.py    Flask middleware API — the interception layer
+|-- data_aegis_server.py    Flask middleware API - the interception layer
 
-|-- ai_agent.py             AI agent — calls middleware, never database directly
+|-- ai_agent.py             AI agent - calls middleware, never database directly
 
 |-- security_core.py        LLM classification engine, MITRE mapping, SIEM alerts
 
@@ -274,9 +274,9 @@ open data_aegis_platform.html in your browser
 
 The repository includes sample output files showing what Data-Aegis generates in a real monitoring session:
 
-`sample_incident_log.json` — full audit trail with MITRE-tagged incidents and SIEM-style alerts
+`sample_incident_log.json` - full audit trail with MITRE-tagged incidents and SIEM-style alerts
 
-`sample_risk_dashboard.html` — visual risk dashboard showing threat breakdown, regional risk, and open incidents
+`sample_risk_dashboard.html` - visual risk dashboard showing threat breakdown, regional risk, and open incidents
 
 ---
 
