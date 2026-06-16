@@ -1,0 +1,128 @@
+{
+  "customers": [
+    {
+      "customer_id": "C-001",
+      "name": "John Doe",
+      "ssn": "000-12-3456",
+      "email": "john.doe@gmail.com",
+      "phone": "314-555-0123",
+      "date_of_birth": "04/12/1985",
+      "account_balance": 15000,
+      "account_type": "Premium",
+      "recent_transactions": [
+        {"date": "2026-06-01", "amount": 450, "type": "dispute"},
+        {"date": "2026-05-28", "amount": 1200, "type": "purchase"}
+      ],
+      "aws_role": "arn:aws:iam::123456789012:user/john.doe",
+      "department": "Finance"
+    },
+    {
+      "customer_id": "C-002",
+      "name": "Sarah Smith",
+      "ssn": "111-22-3333",
+      "email": "sarah.smith@outlook.com",
+      "phone": "314-555-0456",
+      "date_of_birth": "07/23/1990",
+      "account_balance": 8500,
+      "account_type": "Standard",
+      "recent_transactions": [
+        {"date": "2026-06-02", "amount": 200, "type": "refund"},
+        {"date": "2026-05-30", "amount": 650, "type": "purchase"}
+      ],
+      "aws_role": "arn:aws:iam::123456789012:user/sarah.smith",
+      "department": "Marketing"
+    },
+    {
+      "customer_id": "C-003",
+      "name": "Michael Johnson",
+      "ssn": "222-33-4444",
+      "email": "michael.j@gmail.com",
+      "phone": "314-555-0789",
+      "date_of_birth": "11/05/1978",
+      "account_balance": 32000,
+      "account_type": "Enterprise",
+      "recent_transactions": [
+        {"date": "2026-06-03", "amount": 5000, "type": "transfer"},
+        {"date": "2026-06-01", "amount": 250, "type": "purchase"}
+      ],
+      "aws_role": "arn:aws:iam::123456789012:user/michael.johnson",
+      "department": "Engineering"
+    },
+    {
+      "customer_id": "C-004",
+      "name": "Emily Davis",
+      "ssn": "333-44-5555",
+      "email": "emily.davis@yahoo.com",
+      "phone": "314-555-0321",
+      "date_of_birth": "03/18/1992",
+      "account_balance": 5200,
+      "account_type": "Standard",
+      "recent_transactions": [
+        {"date": "2026-06-04", "amount": 120, "type": "purchase"},
+        {"date": "2026-05-29", "amount": 80, "type": "purchase"}
+      ],
+      "aws_role": "arn:aws:iam::123456789012:user/emily.davis",
+      "department": "HR"
+    },
+    {
+      "customer_id": "C-005",
+      "name": "David Wilson",
+      "ssn": "444-55-6666",
+      "email": "david.wilson@company.com",
+      "phone": "314-555-0654",
+      "date_of_birth": "09/30/1982",
+      "account_balance": 28000,
+      "account_type": "Enterprise",
+      "recent_transactions": [
+        {"date": "2026-06-05", "amount": 3500, "type": "transfer"},
+        {"date": "2026-06-02", "amount": 1800, "type": "purchase"}
+      ],
+      "aws_role": "arn:aws:iam::123456789012:user/david.wilson",
+      "department": "Security"
+    }
+  ],
+  "employees": [
+    {
+      "employee_id": "E-001",
+      "name": "Admin User",
+      "role": "System Administrator",
+      "aws_access_key": "AKIAIOSFODNN7EXAMPLE",
+      "aws_secret": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+      "permissions": ["AdministratorAccess"],
+      "department": "IT"
+    },
+    {
+      "employee_id": "E-002",
+      "name": "Dev Ops",
+      "role": "Cloud Engineer",
+      "aws_access_key": "AKIAI44QH8DHBEXAMPLE",
+      "aws_secret": "je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY",
+      "permissions": ["AmazonS3FullAccess", "AmazonRDSFullAccess"],
+      "department": "Engineering"
+    }
+  ],
+  "healthcare_records": [
+    {
+      "patient_id": "P-001",
+      "name": "John Doe",
+      "customer_id": "C-001",
+      "date_of_birth": "04/12/1985",
+      "diagnosis_code": "ICD-10 E11.9",
+      "diagnosis_name": "Type 2 Diabetes",
+      "prescriptions": ["Metformin 500mg", "Lisinopril 10mg"],
+      "last_visit": "2026-05-15",
+      "insurance_id": "INS-789456123"
+    },
+    {
+      "patient_id": "P-002",
+      "name": "Sarah Smith",
+      "customer_id": "C-002",
+      "date_of_birth": "07/23/1990",
+      "diagnosis_code": "ICD-10 J45.909",
+      "diagnosis_name": "Asthma",
+      "prescriptions": ["Albuterol inhaler"],
+      "last_visit": "2026-04-22",
+      "insurance_id": "INS-456789012"
+    }
+  ]
+}
