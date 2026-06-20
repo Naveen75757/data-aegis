@@ -1,0 +1,181 @@
+{
+  "session_start": "2026-06-20 11:22:00",
+  "total_queries": 5,
+  "queries": [
+    {
+      "timestamp": "2026-06-20 11:19:54",
+      "query": "pull johns records",
+      "aegis_enabled": true,
+      "action": "MASKED",
+      "detections": 1,
+      "detection_details": [
+        {
+          "record_type": "customer",
+          "sensitive_fields": [
+            {
+              "field": "ssn",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "email",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "phone",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "date_of_birth",
+              "class": "PII",
+              "mitre": "T1005"
+            }
+          ],
+          "incident_id": "INC-44496"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-20 11:20:11",
+      "query": "give johns sssn",
+      "aegis_enabled": true,
+      "action": "MASKED",
+      "detections": 1,
+      "detection_details": [
+        {
+          "record_type": "customer",
+          "sensitive_fields": [
+            {
+              "field": "ssn",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "email",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "phone",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "date_of_birth",
+              "class": "PII",
+              "mitre": "T1005"
+            }
+          ],
+          "incident_id": "INC-77775"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-20 11:20:25",
+      "query": "give emily's number",
+      "aegis_enabled": true,
+      "action": "MASKED",
+      "detections": 1,
+      "detection_details": [
+        {
+          "record_type": "customer",
+          "sensitive_fields": [
+            {
+              "field": "ssn",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "email",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "phone",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "date_of_birth",
+              "class": "PII",
+              "mitre": "T1005"
+            }
+          ],
+          "incident_id": "INC-41180"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-20 11:21:54",
+      "query": "GIVE JOHN RECORDS",
+      "aegis_enabled": true,
+      "action": "MASKED",
+      "detections": 1,
+      "detection_details": [
+        {
+          "record_type": "customer",
+          "sensitive_fields": [
+            {
+              "field": "ssn",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "email",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "phone",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "date_of_birth",
+              "class": "PII",
+              "mitre": "T1005"
+            }
+          ],
+          "incident_id": "INC-99197"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-20 11:22:00",
+      "query": "GIVE EMILY'S RECORD",
+      "aegis_enabled": true,
+      "action": "MASKED",
+      "detections": 1,
+      "detection_details": [
+        {
+          "record_type": "customer",
+          "sensitive_fields": [
+            {
+              "field": "ssn",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "email",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "phone",
+              "class": "PII",
+              "mitre": "T1005"
+            },
+            {
+              "field": "date_of_birth",
+              "class": "PII",
+              "mitre": "T1005"
+            }
+          ],
+          "incident_id": "INC-95533"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data-Aegis | AI Security Middleware</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;overflow:hidden;background:#080810;color:#c8c8d8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px}
+a{color:inherit;text-decoration:none}
+
+/* LAYOUT */
+#app{display:grid;grid-template-columns:240px 1fr;height:100vh;width:100vw}
+
+/* SIDEBAR */
+#sidebar{background:#0c0c18;border-right:1px solid #1a1a2e;display:flex;flex-direction:column;overflow:hidden}
+.brand{padding:20px 16px 16px;border-bottom:1px solid #1a1a2e}
+.brand-name{font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.3px}
+.brand-name span{color:#4d8ff0}
+.brand-sub{font-size:11px;color:#444;margin-top:3px;letter-spacing:0.3px;text-transform:uppercase}
+
+/* AEGIS TOGGLE */
+.aegis-box{margin:12px;border-radius:8px;padding:10px 12px;border:1px solid #1a1a2e;cursor:pointer;transition:all 0.2s;user-select:none}
+.aegis-box.on{border-color:#1a4a2e;background:rgba(30,90,55,0.15)}
+.aegis-box.off{border-color:#4a1a1a;background:rgba(90,30,30,0.15)}
+.aegis-row{display:flex;align-items:center;justify-content:space-between}
+.aegis-label{font-size:12px;font-weight:500}
+.aegis-box.on .aegis-label{color:#3dbd72}
+.aegis-box.off .aegis-label{color:#e05555}
+.aegis-sub{font-size:10px;color:#444;margin-top:2px}
+.toggle{width:32px;height:18px;border-radius:9px;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle.on{background:#3dbd72}
+.toggle.off{background:#e05555}
+.knob{position:absolute;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s}
+.toggle.on .knob{left:16px}
+.toggle.off .knob{left:2px}
+
+/* NAV */
+nav{flex:1;padding:8px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:#555;cursor:pointer;transition:all 0.15s;border-right:2px solid transparent;position:relative}
+.nav-item:hover{color:#aaa;background:rgba(255,255,255,0.02)}
+.nav-item.active{color:#4d8ff0;background:rgba(77,143,240,0.07);border-right-color:#4d8ff0}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:#c0392b;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:600;display:none}
+.nav-badge.show{display:inline}
+
+/* STATUS */
+.status-panel{padding:12px 16px;border-top:1px solid #1a1a2e}
+.status-row{display:flex;align-items:center;gap:7px;font-size:11px;color:#3a3a4a;margin-bottom:5px}
+.dot{width:5px;height:5px;border-radius:50%;background:#3dbd72;flex-shrink:0}
+
+/* MAIN */
+#main{display:grid;grid-template-rows:1fr;overflow:hidden;position:relative}
+
+/* TABS */
+.tab{display:none;flex-direction:column;height:100%;overflow:hidden}
+.tab.active{display:flex}
+
+/* TAB HEADER */
+.tab-hdr{padding:16px 20px;border-bottom:1px solid #1a1a2e;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.tab-hdr-left h2{font-size:14px;font-weight:500;color:#fff}
+.tab-hdr-left p{font-size:11px;color:#444;margin-top:2px}
+.badge-protect{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-protect.on{background:rgba(61,189,114,0.1);color:#3dbd72;border:1px solid rgba(61,189,114,0.25)}
+.badge-protect.off{background:rgba(224,85,85,0.1);color:#e05555;border:1px solid rgba(224,85,85,0.25)}
+
+/* CHAT */
+#messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+#messages::-webkit-scrollbar{width:3px}
+#messages::-webkit-scrollbar-thumb{background:#1a1a2e;border-radius:2px}
+.msg{display:flex;gap:10px;max-width:88%}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:2px}
+.avatar.user{background:#1a3a6a;color:#4d8ff0}
+.avatar.sys{background:#151525;color:#444;border:1px solid #1a1a2e}
+.bubble{padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.65;max-width:100%}
+.msg.user .bubble{background:#0f2040;border:1px solid #1a3060;color:#c8d8f0;border-radius:10px 2px 10px 10px}
+.msg.sys .bubble{background:#0f0f1c;border:1px solid #1a1a2e;color:#c8c8d8;border-radius:2px 10px 10px 10px}
+.bubble.blocked{border-color:rgba(224,85,85,0.35);background:rgba(80,20,20,0.2)}
+.bubble.safe{border-color:rgba(61,189,114,0.25)}
+.bubble.warn{border-color:rgba(224,85,85,0.35);background:rgba(80,20,20,0.15)}
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;margin:2px 2px 2px 0;vertical-align:middle}
+.tag-pii{background:rgba(224,85,85,0.12);color:#e05555}
+.tag-cred{background:rgba(230,140,50,0.12);color:#e68c32}
+.tag-health{background:rgba(155,100,200,0.12);color:#9b64c8}
+.tag-iam{background:rgba(77,143,240,0.12);color:#4d8ff0}
+.tag-mitre{background:rgba(77,143,240,0.08);color:#4d8ff0;border:1px solid rgba(77,143,240,0.2)}
+.tag-blocked{background:rgba(224,85,85,0.12);color:#e05555}
+.tag-clean{background:rgba(61,189,114,0.1);color:#3dbd72}
+.typing-dots{display:flex;gap:4px;padding:4px 0}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:#2a2a3a;animation:pulse 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,60%,100%{transform:translateY(0);background:#2a2a3a}30%{transform:translateY(-5px);background:#4d8ff0}}
+
+/* CHAT INPUT */
+.chat-input-row{padding:12px 20px;border-top:1px solid #1a1a2e;display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+#chatInput{flex:1;background:#0f0f1c;border:1px solid #1a1a2e;border-radius:10px;padding:10px 14px;color:#c8c8d8;font-size:13px;resize:none;outline:none;font-family:inherit;max-height:100px;line-height:1.5;transition:border-color 0.15s}
+#chatInput:focus{border-color:#2a3a5a}
+#chatInput::placeholder{color:#2a2a3a}
+#sendBtn{width:36px;height:36px;border-radius:8px;background:#1a3a6a;border:1px solid #2a4a8a;color:#4d8ff0;cursor:pointer;font-size:14px;flex-shrink:0;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+#sendBtn:hover{background:#1e4080;border-color:#3a5a9a}
+#sendBtn:disabled{background:#111120;border-color:#1a1a2e;color:#2a2a3a;cursor:not-allowed}
+
+/* SCROLLABLE BODY */
+.tab-body{flex:1;overflow-y:auto;padding:20px}
+.tab-body::-webkit-scrollbar{width:3px}
+.tab-body::-webkit-scrollbar-thumb{background:#1a1a2e;border-radius:2px}
+
+/* INCIDENTS TABLE */
+.inc-table{width:100%;border-collapse:collapse}
+.inc-table th{text-align:left;font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.5px;padding:8px 10px;border-bottom:1px solid #1a1a2e}
+.inc-table td{padding:10px;font-size:13px;border-bottom:1px solid #0f0f18;color:#888;vertical-align:middle}
+.inc-table tr:hover td{background:rgba(255,255,255,0.01)}
+.sev{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.sev-critical{background:rgba(224,85,85,0.12);color:#e05555}
+.sev-high{background:rgba(230,140,50,0.12);color:#e68c32}
+.empty{text-align:center;padding:40px 20px;color:#2a2a3a}
+.empty-icon{font-size:28px;margin-bottom:8px}
+.empty p{font-size:12px;color:#333;margin-top:6px}
+
+/* PLAYBOOKS */
+.pb-card{background:#0c0c18;border:1px solid #1a1a2e;border-radius:8px;margin-bottom:10px;overflow:hidden;cursor:pointer;transition:border-color 0.15s}
+.pb-card:hover{border-color:#2a2a4a}
+.pb-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.pb-title{font-size:13px;font-weight:500;color:#ddd}
+.pb-desc{font-size:11px;color:#444;margin-top:3px}
+.pb-meta{display:flex;gap:6px;margin-top:8px;align-items:center}
+.pb-sla{font-size:10px;color:#333;margin-left:auto}
+.pb-chevron{font-size:12px;color:#333;transition:transform 0.2s;flex-shrink:0}
+.pb-card.open .pb-chevron{transform:rotate(180deg)}
+.pb-body{display:none;padding:0 16px 14px;font-size:12px;color:#555;line-height:1.8;border-top:1px solid #1a1a2e}
+.pb-card.open .pb-body{display:block}
+.pb-body strong{color:#aaa;display:block;margin:10px 0 4px}
+.pb-body strong:first-child{margin-top:0}
+
+/* DETECTIONS */
+.det-card{background:#0c0c18;border:1px solid #1a1a2e;border-radius:8px;padding:16px;margin-bottom:14px}
+.det-card h3{font-size:13px;font-weight:500;color:#ddd;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.det-card h3 .tag{margin:0}
+pre{background:#060610;border:1px solid #141420;border-radius:6px;padding:14px;font-size:11px;color:#6a9fd8;overflow-x:auto;line-height:1.7;font-family:'Courier New',monospace;white-space:pre}
+
+/* SCAN BUTTON */
+.scan-btn{background:#0f0f1c;border:1px solid #1a2a4a;color:#4d8ff0;padding:8px 16px;border-radius:7px;font-size:12px;cursor:pointer;transition:all 0.15s;font-family:inherit}
+.scan-btn:hover{background:#131328;border-color:#2a3a6a}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="brand">
+    <div class="brand-name">Data-<span>Aegis</span></div>
+    <div class="brand-sub">AI Security Middleware</div>
+  </div>
+
+  <div class="aegis-box on" id="aegisBox" onclick="toggleAegis()">
+    <div class="aegis-row">
+      <div>
+        <div class="aegis-label" id="aegisLabel">Protection ON</div>
+        <div class="aegis-sub" id="aegisSub">All queries intercepted</div>
+      </div>
+      <div class="toggle on" id="toggleEl"><div class="knob"></div></div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-item active" onclick="showTab('chat',this)">
+      <span class="nav-icon">&#9702;</span> Chat
+    </div>
+    <div class="nav-item" onclick="showTab('incidents',this)">
+      <span class="nav-icon">&#9651;</span> Incidents
+      <span class="nav-badge" id="incBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showTab('playbooks',this)">
+      <span class="nav-icon">&#9670;</span> Playbooks
+    </div>
+    <div class="nav-item" onclick="showTab('detections',this)">
+      <span class="nav-icon">&#9632;</span> Detections
+    </div>
+    <div class="nav-item" onclick="showTab('scanner',this)">
+  <span class="nav-icon">&#9673;</span> Log Scanner
+</div>
+  </nav>
+
+  <div class="status-panel">
+    <div class="status-row"><div class="dot"></div>Classification Engine</div>
+    <div class="status-row"><div class="dot"></div>Masking Engine</div>
+    <div class="status-row"><div class="dot"></div>MITRE Mapper</div>
+    <div class="status-row"><div class="dot"></div>Anomaly Detector</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- CHAT -->
+  <div class="tab active" id="tab-chat">
+    <div class="tab-hdr">
+      <div class="tab-hdr-left">
+        <h2>Enterprise AI Assistant</h2>
+        <p>All queries routed through Data-Aegis middleware</p>
+      </div>
+      <div class="badge-protect on" id="protBadge">Protected</div>
+    </div>
+    <div id="messages">
+      <div class="msg sys">
+        <div class="avatar sys">DA</div>
+        <div class="bubble">
+          <strong style="color:#ddd">Data-Aegis is active.</strong> Ask me anything about your enterprise data — customer records, employee information, or security events. All queries are intercepted and sensitive data is masked before reaching the AI.<br><br>
+          Try: <em style="color:#4d8ff0">"Show me John Doe's account"</em> or <em style="color:#4d8ff0">"Scan recent security events"</em>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea id="chatInput" placeholder="Ask anything about your enterprise data..." rows="1" onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
+      <button id="sendBtn" onclick="send()">&#10148;</button>
+    </div>
+  </div>
+
+  <!-- INCIDENTS -->
+  <div class="tab" id="tab-incidents">
+    <div class="tab-hdr">
+      <div class="tab-hdr-left">
+        <h2>Incident Log</h2>
+        <p>All security incidents generated this session</p>
+      </div>
+      <button class="scan-btn" onclick="loadIncidents()">Refresh</button>
+    </div>
+    <div class="tab-body">
+      <div id="incContent">
+        <div class="empty"><div class="empty-icon">&#9632;</div><p>No incidents yet. Start querying data to generate incidents.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYBOOKS -->
+  <div class="tab" id="tab-playbooks">
+    <div class="tab-hdr">
+      <div class="tab-hdr-left">
+        <h2>SOC Response Playbooks</h2>
+        <p>Incident response procedures for each threat category</p>
+      </div>
+    </div>
+    <div class="tab-body">
+
+      <div class="pb-card" onclick="togglePb(this)">
+        <div class="pb-header">
+          <div>
+            <div class="pb-title">PII Exposure Response</div>
+            <div class="pb-desc">SSN, email, and personal identifier exposure</div>
+            <div class="pb-meta">
+              <span class="tag tag-pii">PII</span>
+              <span class="tag tag-mitre">T1005</span>
+              <span class="pb-sla">SLA: 15 min acknowledge</span>
+            </div>
+          </div>
+          <div class="pb-chevron">&#9660;</div>
+        </div>
+        <div class="pb-body">
+          <strong>Immediate Response (0-15 mins)</strong>
+          1. Acknowledge incident in Data-Aegis incident log<br>
+          2. Identify source record, region, and accessor account<br>
+          3. Verify masking was applied — confirm [REDACTED] tokens in output<br>
+          4. Identify the data subject and notify data owner<br>
+          <strong>Containment</strong>
+          1. Suspend accessor account if malicious behavior suspected<br>
+          2. Review bulk access patterns — threshold is 5 records per session<br>
+          3. Preserve all evidence — do not modify original logs<br>
+          <strong>Escalation Criteria</strong>
+          More than 10 records exposed, external contractor was the accessor, access occurred outside business hours, or same user flagged in multiple regions<br>
+          <strong>GDPR Note</strong>
+          72-hour breach notification required if EU data subjects are affected
+        </div>
+      </div>
+
+      <div class="pb-card" onclick="togglePb(this)">
+        <div class="pb-header">
+          <div>
+            <div class="pb-title">Credential Leak Response</div>
+            <div class="pb-desc">Exposed AWS keys, passwords, and access tokens</div>
+            <div class="pb-meta">
+              <span class="tag tag-cred">Credentials</span>
+              <span class="tag tag-mitre">T1552</span>
+              <span class="pb-sla">SLA: 5 min — critical</span>
+            </div>
+          </div>
+          <div class="pb-chevron">&#9660;</div>
+        </div>
+        <div class="pb-body">
+          <strong>Immediate Response — Treat as Critical</strong>
+          1. Assume key is already compromised — rotate before investigating<br>
+          2. Deactivate the exposed key in AWS IAM console immediately<br>
+          3. Check CloudTrail for any usage of the key between exposure and rotation<br>
+          4. Generate new credentials for the affected service account<br>
+          <strong>Investigation</strong>
+          1. What permissions did this key have?<br>
+          2. Was it used from any unknown IP addresses?<br>
+          3. Check for lateral movement — did the key access unexpected resources?<br>
+          <strong>Escalation Criteria</strong>
+          Key has AdministratorAccess, evidence of unauthorized usage before rotation, or multiple keys exposed in same session
+        </div>
+      </div>
+
+      <div class="pb-card" onclick="togglePb(this)">
+        <div class="pb-header">
+          <div>
+            <div class="pb-title">Healthcare Data Response</div>
+            <div class="pb-desc">HIPAA breach response for patient records and diagnosis codes</div>
+            <div class="pb-meta">
+              <span class="tag tag-health">Healthcare</span>
+              <span class="tag tag-mitre">T1530</span>
+              <span class="pb-sla">SLA: 15 min + legal</span>
+            </div>
+          </div>
+          <div class="pb-chevron">&#9660;</div>
+        </div>
+        <div class="pb-body">
+          <strong>Immediate Response (0-15 mins)</strong>
+          1. Notify Privacy Officer immediately — HIPAA mandates this<br>
+          2. Identify which patient record was exposed and which account accessed it<br>
+          3. Preserve all evidence — the Data-Aegis audit trail is your primary evidence<br>
+          4. Restrict access to the affected healthcare data bucket<br>
+          <strong>HIPAA Breach Assessment</strong>
+          1. Nature and extent of PHI involved<br>
+          2. Who accessed or could have accessed the PHI<br>
+          3. Whether PHI was actually acquired or only viewed<br>
+          4. Extent to which risk has been mitigated<br>
+          <strong>Notification Requirements</strong>
+          Individual notification within 60 days. HHS notification if 500+ individuals affected. Media notification if 500+ state residents affected.
+        </div>
+      </div>
+
+      <div class="pb-card" onclick="togglePb(this)">
+        <div class="pb-header">
+          <div>
+            <div class="pb-title">IAM Violation Response</div>
+            <div class="pb-desc">Privilege escalation and unauthorized policy changes</div>
+            <div class="pb-meta">
+              <span class="tag tag-iam">IAM</span>
+              <span class="tag tag-mitre">T1078</span>
+              <span class="pb-sla">SLA: 15 min + revert</span>
+            </div>
+          </div>
+          <div class="pb-chevron">&#9660;</div>
+        </div>
+        <div class="pb-body">
+          <strong>Immediate Response (0-15 mins)</strong>
+          1. Identify what permissions were granted and to which account<br>
+          2. Check for a valid change ticket — no ticket means treat as unauthorized<br>
+          3. Revert the policy change immediately if no authorization found<br>
+          4. Suspend the actor account if behavior looks malicious<br>
+          <strong>Investigation</strong>
+          1. Review all actions by this account in the last 24 hours via CloudTrail<br>
+          2. Check for persistence — were new IAM users or access keys created?<br>
+          3. Did the escalated account access any sensitive resources after the change?<br>
+          <strong>Escalation Criteria</strong>
+          AdministratorAccess was granted, evidence of data exfiltration following the change, or an external contractor account made the modification
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DETECTIONS -->
+  <div class="tab" id="tab-detections">
+    <div class="tab-hdr">
+      <div class="tab-hdr-left">
+        <h2>Detection Rules</h2>
+        <p>Sigma rules and SQL queries for SIEM integration</p>
+      </div>
+    </div>
+    <div class="tab-body">
+
+      <div class="det-card">
+        <h3><span class="tag tag-cred">Sigma</span> AWS Credential Exposure Detection</h3>
+        <pre>title: Exposed AWS IAM Access Key in CloudTrail
+id: 4a3b2c1d-ef12-3456-a7b8-90abcdef1234
+status: experimental
+description: Detects AKIA credential strings in log contents
+logsource:
+    product: aws
+    service: cloudtrail
+detection:
+    selection:
+        message|contains: 'AKIA'
+    condition: selection
+level: high
+tags:
+    - attack.credential_access
+    - attack.t1552</pre>
+      </div>
+
+      <div class="det-card">
+        <h3><span class="tag tag-iam">SQL</span> Privilege Escalation Detection</h3>
+        <pre>SELECT
+    eventTime,
+    userIdentity.arn        AS actor_arn,
+    requestParameters.policyArn AS attached_policy,
+    awsRegion
+FROM aws_cloudtrail_logs
+WHERE
+    eventName IN ('AttachUserPolicy', 'PutRolePolicy')
+    AND requestParameters.policyArn LIKE '%FullAccess%'
+    AND eventTime >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+
+ORDER BY eventTime DESC;</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LOG SCANNER -->
+  <div class="tab" id="tab-scanner">
+    <div class="tab-hdr">
+      <div class="tab-hdr-left">
+        <h2>Log Scanner</h2>
+        <p>Two scan modes — real session activity or simulated enterprise stream</p>
+      </div>
+    </div>
+    <div class="tab-body">
+
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <button class="scan-btn" onclick="scanSession()" style="flex:1;padding:14px">
+          Scan Session Activity<br>
+          <span style="font-size:10px;color:#444">Real queries made in this chat session</span>
+        </button>
+        <button class="scan-btn" onclick="scanCloudTrail()" style="flex:1;padding:14px">
+          Scan CloudTrail Stream<br>
+          <span style="font-size:10px;color:#444">Simulated enterprise log volume demo</span>
+        </button>
+      </div>
+
+      <div id="scannerResults">
+        <div class="empty"><div class="empty-icon">&#9673;</div><p>Choose a scan mode above to begin.</p></div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+</div>
+
+<script>
+var aegis = true;
+var incidents = [];
+
+function toggleAegis(){
+  aegis = !aegis;
+  var box = document.getElementById('aegisBox');
+  var lbl = document.getElementById('aegisLabel');
+  var sub = document.getElementById('aegisSub');
+  var tog = document.getElementById('toggleEl');
+  var badge = document.getElementById('protBadge');
+  if(aegis){
+    box.className='aegis-box on'; lbl.textContent='Protection ON'; sub.textContent='All queries intercepted';
+    tog.className='toggle on'; badge.className='badge-protect on'; badge.textContent='Protected';
+    addMsg('sys','Data-Aegis ENABLED — all queries are now intercepted and sensitive data will be masked before reaching the AI.','');
+  } else {
+    box.className='aegis-box off'; lbl.textContent='Protection OFF'; sub.textContent='Raw data exposed';
+    tog.className='toggle off'; badge.className='badge-protect off'; badge.textContent='Unprotected';
+    addMsg('sys','Data-Aegis DISABLED — the AI agent now has direct database access. Sensitive data will be exposed in responses.','warn');
+  }
+}
+
+function showTab(id, el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='incidents') loadIncidents();
+}
+
+function togglePb(card){
+  card.classList.toggle('open');
+}
+
+function resize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,100)+'px';
+}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}
+}
+
+function addMsg(type, html, cls){
+  var wrap=document.createElement('div');
+  wrap.className='msg '+type;
+  var init=type==='user'?'You':'DA';
+  wrap.innerHTML='<div class="avatar '+type+'">'+init+'</div><div class="bubble '+(cls||'')+'">'+html+'</div>';
+  var msgs=document.getElementById('messages');
+  msgs.appendChild(wrap);
+  msgs.scrollTop=msgs.scrollHeight;
+  return wrap;
+}
+
+function showTyping(){
+  var wrap=document.createElement('div');
+  wrap.className='msg sys'; wrap.id='typing';
+  wrap.innerHTML='<div class="avatar sys">DA</div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  var msgs=document.getElementById('messages');
+  msgs.appendChild(wrap);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function hideTyping(){var t=document.getElementById('typing');if(t)t.remove();}
+
+function bumpBadge(){
+  var b=document.getElementById('incBadge');
+  incidents.length>0?(b.textContent=incidents.length,b.classList.add('show')):b.classList.remove('show');
+}
+
+async function send(){
+  var input=document.getElementById('chatInput');
+  var q=input.value.trim();
+  if(!q) return;
+  input.value=''; input.style.height='auto';
+  document.getElementById('sendBtn').disabled=true;
+  addMsg('user',q,'');
+  showTyping();
+  try{
+    var resp=await fetch('http://localhost:5000/query',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({query:q,aegis_enabled:aegis})
+    });
+    var data=await resp.json();
+    hideTyping();
+    if(resp.status===403){
+      var inc=data.incident||{};
+      var html='<strong style="color:#e05555">Query Blocked by Data-Aegis</strong><br><br>';
+      html+='This query was flagged as a potential data exfiltration attempt and was not executed.<br><br>';
+      html+='<span class="tag tag-blocked">BLOCKED</span> <span class="tag tag-mitre">'+(inc.mitre_technique_id||'T1005')+'</span> <span class="tag tag-pii">Risk: 9/10</span><br><br>';
+      html+='<span style="color:#444">Incident:</span> <span style="color:#888">'+inc.incident_id+'</span><br>';
+      html+='<span style="color:#444">Escalated to:</span> <span style="color:#888">SOC_AGENT_01</span><br>';
+      html+='<span style="color:#444">Playbook:</span> <span style="color:#888">PII Exposure Response</span>';
+      addMsg('sys',html,'blocked');
+      if(inc.incident_id) incidents.push(inc);
+      bumpBadge();
+    } else if(!data.protected){
+      var recs=data.records||[];
+      var html='<strong style="color:#e05555">Data-Aegis DISABLED — Raw Data Exposed</strong><br><br>';
+      if(recs.length>0){
+        html+='Sensitive fields returned to AI without masking:<br>';
+        recs.forEach(function(r){
+          if(r.ssn) html+='<span class="tag tag-pii">SSN: '+r.ssn+'</span> ';
+          if(r.email) html+='<span class="tag tag-pii">Email: '+r.email+'</span> ';
+          if(r.aws_access_key) html+='<span class="tag tag-cred">AWS Key: '+r.aws_access_key+'</span> ';
+          if(r.diagnosis_code) html+='<span class="tag tag-health">Diagnosis: '+r.diagnosis_code+'</span> ';
+          if(r.date_of_birth) html+='<span class="tag tag-pii">DOB: '+r.date_of_birth+'</span> ';
+        });
+        html+='<br><br>';
+      }
+      try{
+        var ar=await fetch('http://localhost:5000/generate-response',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({query:q,records:recs,protected:false})
+        });
+        var ad=await ar.json();
+        html+='<strong style="color:#aaa">AI Response (unprotected):</strong><br>'+ad.response;
+      } catch(e){ html+='The AI received raw sensitive data including SSNs and credentials.'; }
+      addMsg('sys',html,'warn');
+    } else {
+      var dets=data.detections||[];
+      var recs=data.records||[];
+      var html='';
+      if(dets.length>0){
+        html+='<strong style="color:#3dbd72">Data-Aegis Intercepted</strong> — sensitive fields masked before AI access:<br>';
+        dets.forEach(function(d){
+          (d.sensitive_fields||[]).forEach(function(f){
+            var tc=f.class==='PII'?'tag-pii':f.class==='Credentials'?'tag-cred':f.class==='Healthcare'?'tag-health':'tag-iam';
+            html+='<span class="tag '+tc+'">'+f.field+' masked</span> <span class="tag tag-mitre">'+f.mitre+'</span> ';
+          });
+          if(d.incident_id) incidents.push(d);
+        });
+        html+='<br><br>';
+        bumpBadge();
+      } else {
+        html+='<span class="tag tag-clean">No sensitive data detected</span><br><br>';
+      }
+      try{
+        var clean=recs.map(function(r){return r.data||r;});
+        var ar=await fetch('http://localhost:5000/generate-response',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({query:q,records:clean,protected:true})
+        });
+        var ad=await ar.json();
+        html+='<strong style="color:#aaa">AI Response:</strong><br>'+ad.response;
+      } catch(e){ html+='Data retrieved and sanitized successfully.'; }
+      addMsg('sys',html,dets.length>0?'safe':'');
+    }
+  } catch(e){
+    hideTyping();
+    addMsg('sys','Cannot connect to Data-Aegis server. Make sure it is running: <code style="color:#4d8ff0">python data_aegis_server.py</code>','blocked');
+  }
+  document.getElementById('sendBtn').disabled=false;
+}
+
+async function scanSession(){
+  var cont = document.getElementById('scannerResults');
+  cont.innerHTML = '<div class="empty"><p>Scanning session activity...</p></div>';
+  try{
+    var r = await fetch('http://localhost:5000/session-log');
+    var data = await r.json();
+    var log = data.log || [];
+
+    if(log.length === 0){
+      cont.innerHTML = '<div class="empty"><div class="empty-icon">&#9673;</div><p>No session activity yet. Go to Chat and run a few queries first.</p></div>';
+      return;
+    }
+
+    var html = '<div style="margin-bottom:16px;display:flex;gap:10px">';
+    html += '<span class="tag tag-blocked">Blocked: '+data.blocked+'</span>';
+    html += '<span class="tag tag-clean">Masked: '+data.masked+'</span>';
+    html += '<span class="tag tag-pii">Unprotected: '+data.unprotected+'</span>';
+    html += '<span class="tag tag-mitre">Total: '+data.total_queries+'</span>';
+    html += '</div>';
+    html += '<p style="font-size:11px;color:#444;margin-bottom:10px">Click any row to see what was detected and masked</p>';
+
+    html += '<table class="inc-table"><thead><tr><th>Time</th><th>Query</th><th>Action</th><th>Risk</th></tr></thead><tbody>';
+    log.forEach(function(entry, idx){
+      var actionTag = entry.action === 'BLOCKED' ? 'tag-blocked' :
+                       entry.action === 'MASKED' ? 'tag-clean' :
+                       entry.action === 'UNPROTECTED_PASS_THROUGH' ? 'tag-pii' : 'tag-mitre';
+      html += '<tr style="cursor:pointer" onclick="toggleSessionDetail('+idx+')">';
+      html += '<td style="font-size:11px;color:#333">'+entry.timestamp+'</td>';
+      html += '<td style="font-size:12px">'+entry.query+'</td>';
+      html += '<td><span class="tag '+actionTag+'">'+(entry.action||'-')+'</span></td>';
+      html += '<td style="font-size:12px">'+(entry.aegis_enabled ? 'Protected' : 'Unprotected')+'</td>';
+      html += '</tr>';
+      html += '<tr id="sdetail-'+idx+'" style="display:none"><td colspan="4" style="background:#070710;padding:14px;font-size:12px;color:#888;line-height:1.7">';
+
+      if(entry.action === 'MASKED' && entry.detection_details && entry.detection_details.length > 0){
+        html += '<strong style="color:#aaa">Fields masked before AI access:</strong><br>';
+        entry.detection_details.forEach(function(d){
+          (d.sensitive_fields||[]).forEach(function(f){
+            var tc=f.class==='PII'?'tag-pii':f.class==='Credentials'?'tag-cred':f.class==='Healthcare'?'tag-health':'tag-iam';
+            html += '<span class="tag '+tc+'">'+f.field+'</span> <span class="tag tag-mitre">'+f.mitre+'</span> ';
+          });
+        });
+      } else if(entry.action === 'UNPROTECTED_PASS_THROUGH'){
+        html += '<strong style="color:#e05555">No masking applied</strong><br>';
+        html += (entry.exposed_record_count||0)+' record(s) returned with raw sensitive fields exposed to the AI.';
+      } else if(entry.action === 'CLEAN'){
+        html += '<span class="tag tag-clean">No sensitive data detected in matched records</span>';
+      } else if(entry.action === 'BLOCKED'){
+        html += '<strong style="color:#e05555">Query blocked before execution</strong><br>Identified as a potential data exfiltration attempt.';
+      } else {
+        html += 'No additional detail available.';
+      }
+
+      html += '</td></tr>';
+    });
+    html += '</tbody></table>';
+    cont.innerHTML = html;
+
+  } catch(e){
+    cont.innerHTML = '<div class="empty"><p>Cannot connect to server.</p></div>';
+  }
+}
+
+function toggleSessionDetail(idx){
+  var row = document.getElementById('sdetail-'+idx);
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+async function scanCloudTrail(){
+  var cont = document.getElementById('scannerResults');
+  cont.innerHTML = '<div class="empty"><p>Generating and scanning synthetic CloudTrail stream...</p></div>';
+  try{
+    var r = await fetch('http://localhost:5000/scan-cloudtrail', {method:'POST'});
+    var data = await r.json();
+    var results = data.results || [];
+
+    var html = '<div style="margin-bottom:16px;display:flex;gap:10px">';
+    html += '<span class="tag tag-mitre">Scanned: '+data.total_scanned+'</span>';
+    html += '<span class="tag tag-blocked">Flagged: '+data.flagged+'</span>';
+    html += '<span class="tag tag-clean">Clean: '+data.clean+'</span>';
+    html += '<span class="tag tag-iam">Anomalies: '+data.anomalies_detected+'</span>';
+    html += '</div>';
+    html += '<p style="font-size:11px;color:#444;margin-bottom:10px">Click any row to see the raw log content and AI reasoning</p>';
+
+    html += '<table class="inc-table"><thead><tr><th>Ticket</th><th>Source</th><th>Region</th><th>Risk</th><th>Data Class</th><th>MITRE</th></tr></thead><tbody>';
+    results.forEach(function(r, idx){
+      var sc = r.risk_score >= 8 ? 'sev-critical' : r.risk_score >= 5 ? 'sev-high' : '';
+      html += '<tr style="cursor:pointer" onclick="toggleScanDetail('+idx+')">';
+      html += '<td style="font-size:12px">'+r.ticket_id+'</td>';
+      html += '<td style="font-size:12px">'+r.source+'</td>';
+      html += '<td style="font-size:12px">'+r.region+'</td>';
+      html += '<td><span class="sev '+sc+'">'+r.risk_score+'/10</span></td>';
+      html += '<td style="font-size:12px">'+(r.data_class||'-')+'</td>';
+      html += '<td><code style="font-size:11px;color:#4d8ff0">'+(r.mitre_technique_id||'-')+'</code></td>';
+      html += '</tr>';
+      html += '<tr id="detail-'+idx+'" style="display:none"><td colspan="6" style="background:#070710;padding:14px;font-size:12px;color:#888;line-height:1.7">';
+      html += '<strong style="color:#aaa">Raw log content:</strong><br>'+escapeHtml(r.log_content||'-')+'<br><br>';
+      html += '<strong style="color:#aaa">AI reasoning:</strong><br>'+(r.risk_reasoning||'-');
+      if(r.safe_log){
+        html += '<br><br><strong style="color:#aaa">Masked output:</strong><br>'+escapeHtml(r.safe_log);
+      }
+      if(r.anomalies && r.anomalies.length > 0){
+        html += '<br><br><strong style="color:#aaa">Anomalies detected:</strong><br>';
+        r.anomalies.forEach(function(a){
+          html += '&bull; '+a.anomaly_type+' &mdash; '+a.description+'<br>';
+        });
+      }
+      html += '</td></tr>';
+    });
+    html += '</tbody></table>';
+    cont.innerHTML = html;
+
+  } catch(e){
+    cont.innerHTML = '<div class="empty"><p>Cannot connect to server.</p></div>';
+  }
+}
+
+function toggleScanDetail(idx){
+  var row = document.getElementById('detail-'+idx);
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function escapeHtml(text){
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+async function loadIncidents(){
+  try{
+    var r=await fetch('http://localhost:5000/incidents');
+    var data=await r.json();
+    var all=data.incidents||[];
+    var cont=document.getElementById('incContent');
+    if(all.length===0){
+      cont.innerHTML='<div class="empty"><div class="empty-icon">&#9632;</div><p>No incidents yet. Start querying data to generate incidents.</p></div>';
+      return;
+    }
+    var html='<table class="inc-table"><thead><tr><th>Incident ID</th><th>Type</th><th>Severity</th><th>Data Class</th><th>MITRE</th><th>Action</th><th>Time</th></tr></thead><tbody>';
+    all.forEach(function(inc){
+      var sc=inc.severity==='CRITICAL'?'sev-critical':'sev-high';
+      html+='<tr>';
+      html+='<td><code style="color:#4d8ff0;font-size:11px">'+inc.incident_id+'</code></td>';
+      html+='<td style="font-size:11px">'+( inc.type||'DETECTION')+'</td>';
+      html+='<td><span class="sev '+sc+'">'+(inc.severity||'HIGH')+'</span></td>';
+      html+='<td>'+(inc.data_class||'-')+'</td>';
+      html+='<td><code style="font-size:11px;color:#4d8ff0">'+(inc.mitre_technique_id||'-')+'</code></td>';
+      html+='<td>'+(inc.action||'MASKED')+'</td>';
+      html+='<td style="font-size:10px;color:#333">'+(inc.timestamp||'-')+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    cont.innerHTML=html;
+    var b=document.getElementById('incBadge');
+    b.textContent=all.length; b.classList.add('show');
+  } catch(e){
+    document.getElementById('incContent').innerHTML='<div class="empty"><p>Cannot connect to server. Start Data-Aegis first.</p></div>';
+  }
+}
+</script>
+</body>
+</html>

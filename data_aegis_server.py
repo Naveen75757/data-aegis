@@ -19,9 +19,33 @@ from anomaly_detector import run_anomaly_detection
 app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests from web UI
 
-# In-memory incident log for this server session
+# In-memory logs
 server_incidents = []
 server_query_log = []
+
+# Persistent log files
+QUERY_LOG_FILE = "session_query_log.json"
+INCIDENT_LOG_FILE = "session_incident_log.json"
+
+
+def save_logs_to_disk():
+    """Persists all session logs to disk after every query"""
+    try:
+        with open(QUERY_LOG_FILE, "w") as f:
+            json.dump({
+                "session_start": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "total_queries": len(server_query_log),
+                "queries": server_query_log
+            }, f, indent=2)
+
+        with open(INCIDENT_LOG_FILE, "w") as f:
+            json.dump({
+                "session_start": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "total_incidents": len(server_incidents),
+                "incidents": server_incidents
+            }, f, indent=2)
+    except Exception as e:
+        print(f"Warning: could not save logs to disk: {e}")
 
 
 def load_customer_db():
@@ -168,7 +192,9 @@ def intercept_query():
         results = search_database(query)
         raw_records = [r["data"] for r in results]
         log_entry["action"] = "UNPROTECTED_PASS_THROUGH"
+        log_entry["exposed_record_count"] = len(raw_records)
         server_query_log.append(log_entry)
+        save_logs_to_disk()
         return jsonify({
             "protected": False,
             "records": raw_records,
@@ -195,10 +221,11 @@ def intercept_query():
             "playbook": "playbooks/pii_exposure_response.md"
         }
         server_incidents.append(incident)
+        save_logs_to_disk()
         log_entry["action"] = "BLOCKED"
         log_entry["incident_id"] = incident_id
         server_query_log.append(log_entry)
-
+        save_logs_to_disk()
         return jsonify({
             "protected": True,
             "blocked": True,
@@ -212,6 +239,7 @@ def intercept_query():
     if not results:
         log_entry["action"] = "NO_RESULTS"
         server_query_log.append(log_entry)
+        save_logs_to_disk()
         return jsonify({
             "protected": True,
             "blocked": False,
@@ -251,6 +279,7 @@ def intercept_query():
                 "playbook": f"playbooks/{primary_class.lower()}_exposure_response.md"
             }
             server_incidents.append(incident)
+            save_logs_to_disk()
             all_detections.append({
                 "record_type": record_type,
                 "sensitive_fields": sensitive_fields,
@@ -264,8 +293,9 @@ def intercept_query():
 
     log_entry["action"] = "MASKED" if all_detections else "CLEAN"
     log_entry["detections"] = len(all_detections)
+    log_entry["detection_details"] = all_detections
     server_query_log.append(log_entry)
-
+    save_logs_to_disk()
     return jsonify({
         "protected": True,
         "blocked": False,
@@ -284,6 +314,81 @@ def get_incidents():
         "incidents": server_incidents
     })
 
+@app.route('/session-log', methods=['GET'])
+def get_session_log():
+    """
+    Returns the real session activity log.
+    Shows every query made through this server, whether
+    protected, unprotected, blocked, or clean.
+    This is REAL activity, not simulated.
+    """
+    blocked = len([q for q in server_query_log if q.get("action") == "BLOCKED"])
+    masked = len([q for q in server_query_log if q.get("action") == "MASKED"])
+    unprotected = len([q for q in server_query_log if q.get("action") == "UNPROTECTED_PASS_THROUGH"])
+    clean = len([q for q in server_query_log if q.get("action") == "CLEAN"])
+
+    return jsonify({
+        "total_queries": len(server_query_log),
+        "blocked": blocked,
+        "masked": masked,
+        "unprotected": unprotected,
+        "clean": clean,
+        "log": server_query_log
+    })
+
+
+@app.route('/scan-cloudtrail', methods=['POST'])
+def scan_cloudtrail_demo():
+    """
+    Layer 1 — Simulated CloudTrail audit scan.
+    Generates synthetic enterprise log stream and runs
+    full classification, anomaly detection, and MITRE mapping.
+    This is SIMULATED data for demonstration purposes,
+    clearly separate from real session activity.
+    """
+    from data_generator import generate_live_stream
+    from anomaly_detector import run_anomaly_detection
+
+    records = generate_live_stream(10)
+    scan_results = []
+
+    for row in records:
+        log_content = row["service_log"]
+        security_meta = classify_log_entry(log_content)
+        anomalies = run_anomaly_detection(row)
+
+        result = {
+            "ticket_id": row["ticket_id"],
+            "region": row["region"],
+            "source": row["source"],
+            "log_content": log_content,
+            "risk_score": security_meta["risk_score"],
+            "risk_reasoning": security_meta["risk_reasoning"],
+            "flagged": security_meta["contains_sensitive_data"],
+            "anomalies": anomalies
+        }
+
+        if security_meta["contains_sensitive_data"]:
+            mitre = get_mitre_mapping(security_meta["data_class"])
+            sanitized = apply_dynamic_masking(log_content, security_meta["data_class"])
+            result["data_class"] = security_meta["data_class"]
+            result["mitre_technique_id"] = mitre["technique_id"]
+            result["mitre_technique_name"] = mitre["technique_name"]
+            result["mitre_tactic"] = mitre["tactic"]
+            result["safe_log"] = sanitized
+
+        scan_results.append(result)
+
+    flagged = [r for r in scan_results if r["flagged"]]
+    anomaly_count = sum(len(r["anomalies"]) for r in scan_results)
+
+    return jsonify({
+        "total_scanned": len(scan_results),
+        "flagged": len(flagged),
+        "clean": len(scan_results) - len(flagged),
+        "anomalies_detected": anomaly_count,
+        "results": scan_results
+    })
 
 @app.route('/query-log', methods=['GET'])
 def get_query_log():
@@ -360,6 +465,42 @@ def get_status():
         "masked_queries": len([q for q in server_query_log if q.get("action") == "MASKED"]),
     })
 
+@app.route('/generate-response', methods=['POST'])
+def generate_response():
+    """Generates AI response using clean masked data"""
+    from groq import Groq
+    groq_client = Groq()
+    
+    data = request.json
+    query = data.get("query", "")
+    records = data.get("records", [])
+    protected = data.get("protected", True)
+    
+    context = json.dumps(records, indent=2)
+    
+    if protected:
+        system = """You are an enterprise AI assistant. 
+        All sensitive data has been masked by Data-Aegis security middleware.
+        Answer the user's question using only the sanitized data provided.
+        Keep response concise and professional. 2-3 sentences max."""
+    else:
+        system = """You are an enterprise AI assistant.
+        Answer the user's question using the data provided.
+        Be specific and include all details from the records. 2-3 sentences max."""
+    
+    response = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": f"Question: {query}\n\nData:\n{context}"}
+        ],
+        temperature=0,
+        max_tokens=200
+    )
+    
+    return jsonify({
+        "response": response.choices[0].message.content.strip()
+    })
 
 if __name__ == "__main__":
     print("\n" + "="*60)
