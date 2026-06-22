@@ -4,3 +4,9 @@ __pycache__/
 .DS_Store
 incident_log_*.json
 risk_dashboard_*.html
+lambda_deploy.zip
+lambda_package/
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
