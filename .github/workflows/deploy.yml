@@ -24,6 +24,8 @@ jobs:
           pip install pytest
 
       - name: Run unit tests
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           pytest test_security_core.py -v
 
