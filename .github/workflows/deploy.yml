@@ -53,6 +53,8 @@ jobs:
           aws lambda update-function-code \
             --function-name data-aegis-api \
             --zip-file fileb://lambda_deploy.zip
+          aws lambda wait function-updated \
+            --function-name data-aegis-api
 
       - name: Update environment variables
         run: |
