@@ -6,6 +6,48 @@ Built to mirror the architecture of modern AI data security platforms, Data-Aegi
 
 ---
 
+## Live Deployment
+
+Data-Aegis is deployed and publicly accessible on AWS.
+
+**Live web platform:** http://data-aegis-naveen-2026.s3-website-us-east-1.amazonaws.com/data_aegis_platform_aws.html
+
+**API endpoint:** https://g15dfvr9m2.execute-api.us-east-1.amazonaws.com/prod
+
+The backend runs on AWS Lambda behind API Gateway, with the frontend hosted as a static website on S3. Anyone with the link can interact with the live system, querying enterprise data, toggling Data-Aegis protection on and off, and watching real interception happen in the browser.
+
+---
+
+## Infrastructure As Code
+
+The entire AWS deployment is provisioned using Terraform, not manual console configuration. This includes:
+
+- Lambda function and execution role (IAM)
+- API Gateway REST API, including the proxy resource, integration, and deployment stage
+- A VPC with public and private subnets, route tables, an internet gateway, and a NAT Gateway
+
+The Terraform configuration lives in `terraform/`. Running `terraform apply` recreates the entire infrastructure from scratch, demonstrating repeatable, version-controlled deployment.
+
+**Why VPC, if Data-Aegis is already secure by default?** Lambda's managed networking is secure out of the box. The VPC layer was added deliberately as a defense-in-depth measure, the same principle Data-Aegis applies internally with its two detection layers, giving the application verifiable network-level isolation in addition to AWS's default security guarantees.
+
+**Current status:** The VPC, subnets, and security group remain provisioned, but the NAT Gateway is currently torn down to avoid unnecessary cost, since it isn't required for the application to function. It can be re-provisioned on demand with a single `terraform apply`, and has been tested working end-to-end (Lambda inside the VPC successfully reaching the Groq API through the NAT Gateway).
+
+---
+
+## CI/CD Pipeline
+
+A GitHub Actions workflow automatically tests and deploys the application on every push to `main`:
+
+1. Checks out the code and installs dependencies
+2. Runs the unit test suite, deployment is blocked if any test fails
+3. Packages the application for Lambda
+4. Deploys the updated code to the live Lambda function
+5. Updates environment configuration
+
+The workflow is defined in `.github/workflows/deploy.yml`.
+
+---
+
 ## The Problem
 
 Enterprises are connecting AI agents to massive internal data stores. Those agents pull data to answer employee queries but they have no awareness of what's sensitive and what isn't. An AI agent asked to summarize recent customer support tickets might pull records containing SSNs, AWS access keys, or patient diagnoses and include that information directly in its response.
@@ -19,55 +61,34 @@ This is not a theoretical risk. It is happening right now across every industry 
 Data-Aegis runs as a standalone Flask API server. AI agents cannot access enterprise data directly - every query must go through the Data-Aegis middleware endpoint. The middleware intercepts the request, searches the data store, scans every record for sensitive fields, masks them using targeted redaction per data class, and returns only clean sanitized data to the AI agent.
 
 The AI responds to the user without ever having seen the raw sensitive data. The exposure never happens.
+
+```
 AI Agent sends query
-
-|
-
-v
-
-Data-Aegis API (localhost:5000)
-
-|
-
-v
-
+        |
+        v
+Data-Aegis API
+        |
+        v
 Intent Analysis - is this query malicious?
-
-|
-
-v
-
+        |
+        v
 Database Search - find relevant records
-
-|
-
-v
-
+        |
+        v
 Sensitive Field Detection - PII, credentials, HIPAA, IAM, financial
-
-|
-
-v
-
+        |
+        v
 Dynamic Masking - targeted redaction per data class
-
-|
-
-v
-
+        |
+        v
 Incident Generation - MITRE ATT&CK tagged, SIEM-style alert
-
-|
-
-v
-
+        |
+        v
 Clean Data returned to AI Agent
-
-|
-
-v
-
+        |
+        v
 AI responds safely - sensitive data never exposed
+```
 
 ---
 
@@ -132,75 +153,54 @@ Six unit tests covering every masking scenario - credential redaction, SSN redac
 ---
 
 ## Architecture
+
+```
 data-aegis/
-
 |
-
 |-- data_aegis_server.py    Flask middleware API - the interception layer
-
 |-- ai_agent.py             AI agent - calls middleware, never database directly
-
 |-- security_core.py        LLM classification engine, MITRE mapping, SIEM alerts
-
 |-- app.py                  Dynamic masking engine per threat class
-
 |-- agent.py                Autonomous SOC monitoring loop
-
 |-- anomaly_detector.py     Behavioral anomaly detection engine
-
 |-- data_generator.py       Synthetic CloudTrail log generator
-
 |-- report_generator.py     Risk intelligence dashboard generator
-
 |-- customer_db.json        Enterprise data store with PII, credentials, healthcare
-
 |-- mock_db.json            CloudTrail log data source for Layer 1
-
 |-- chat.py                 Unified terminal chat interface
-
 |
-
+|-- terraform/
+|   |-- main.tf                  Provider configuration
+|   |-- iam.tf                   Lambda execution role
+|   |-- lambda.tf                Lambda function definition
+|   |-- api_gateway.tf           REST API, proxy resource, deployment, stage
+|   |-- vpc.tf                   VPC, subnets, route tables, NAT Gateway
+|   |-- variables.tf             Input variables (Groq API key)
+|
+|-- .github/workflows/
+|   |-- deploy.yml               CI/CD pipeline - test and deploy on push
+|
 |-- detections/
-
 |   |-- aws_credential_leak.sigma     Sigma detection rule
-
 |   |-- privilege_escalation.sql      SQL detection query
-
 |
-
 |-- playbooks/
-
 |   |-- pii_exposure_response.md
-
 |   |-- credential_leak_response.md
-
 |   |-- healthcare_data_response.md
-
 |   |-- iam_violation_response.md
-
 |
-
 |-- sample_incident_log.json      Sample audit trail output
-
 |-- sample_risk_dashboard.html    Sample risk dashboard
-
----
-
-## Production Deployment Path
-
-The local prototype maps directly to a production AWS deployment:
-
-| Local | Production |
-|---|---|
-| Flask server on localhost:5000 | AWS Lambda + API Gateway |
-| customer_db.json | Amazon RDS or S3 data lake |
-| data_generator.py | Real CloudTrail via SQS queue |
-| In-memory session logs | CloudWatch + S3 audit bucket |
-| Local HTML file | S3 static website hosting |
+```
 
 ---
 
 ## Getting Started
+
+The fastest way to try Data-Aegis is the live deployment linked above, no setup required.
+
+To run it locally:
 
 **Prerequisites:**
 - Python 3.10 or higher
@@ -231,18 +231,18 @@ python ai_agent.py
 ```
 
 **Try these queries with Data-Aegis ON:**
+```
 pull John Doe data
-
 show me Sarah's account
-
 get employee records
-
 show me all SSNs
+```
 
 **Toggle protection off to see raw data exposure:**
+```
 aegis off
-
 pull John Doe data
+```
 
 **Run the Layer 1 SOC scanner:**
 ```bash
@@ -250,9 +250,14 @@ python agent.py
 ```
 
 **Open the web platform:**
-open data_aegis_platform.html in your browser
+Open `data_aegis_platform.html` in your browser (requires `data_aegis_server.py` running locally).
 
-(requires data_aegis_server.py running)
+**Deploy the infrastructure yourself:**
+```bash
+cd terraform
+terraform init
+terraform apply -var="groq_api_key=YOUR_KEY"
+```
 
 ---
 
@@ -285,6 +290,9 @@ The repository includes sample output files showing what Data-Aegis generates in
 - Python 3.10+
 - Flask, Flask-CORS
 - LLaMA 3.3 70B via Groq API
+- AWS Lambda, API Gateway, S3, VPC, IAM
+- Terraform
+- GitHub Actions
 - AWS CloudTrail log format
 - Sigma detection rules
 - Snowflake-compatible SQL
