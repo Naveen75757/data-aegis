@@ -1,0 +1,59 @@
+name: Deploy Data-Aegis to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run unit tests
+        run: |
+          pytest test_security_core.py -v
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package Lambda function
+        run: |
+          mkdir -p lambda_package
+          pip install -r requirements.txt -t lambda_package --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12
+          cp *.py lambda_package/
+          cp *.json lambda_package/
+          cp -r detections lambda_package/
+          cp -r playbooks lambda_package/
+          cd lambda_package
+          zip -r ../lambda_deploy.zip .
+          cd ..
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name data-aegis-api \
+            --zip-file fileb://lambda_deploy.zip
+
+      - name: Update environment variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name data-aegis-api \
+            --environment "Variables={GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}}"
